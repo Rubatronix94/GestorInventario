@@ -1,0 +1,119 @@
+@model IEnumerable<GestorInventario.Models.Producto>
+
+@{
+    ViewData["Title"] = "Productos";
+    var stockBajo = Model.Where(p => p.StockBajo).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Productos</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Nuevo producto
+    </a>
+</div>
+
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* Alerta de productos con stock bajo *@
+@if (stockBajo.Any())
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <strong>Stock bajo:</strong>
+        @string.Join(", ", stockBajo.Select(p => $"{p.Nombre} ({p.Stock} uds.)"))
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No hay productos registrados todavía.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Proveedor</th>
+                    <th class="text-end">Precio</th>
+                    <th class="text-center">Stock</th>
+                    <th class="text-center">Estado</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var producto in Model)
+                {
+                    <tr class="@(producto.StockBajo ? "table-warning" : "")">
+                        <td>
+                            <strong>@producto.Nombre</strong>
+                            @if (!string.IsNullOrEmpty(producto.Descripcion))
+                            {
+                                <br />
+                                <small class="text-muted">@producto.Descripcion</small>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-info text-dark">
+                                @producto.Categoria?.Nombre
+                            </span>
+                        </td>
+                        <td>@(producto.Proveedor?.Nombre ?? "—")</td>
+                        <td class="text-end fw-semibold">@producto.Precio.ToString("C")</td>
+                        <td class="text-center">
+                            @if (producto.StockBajo)
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-exclamation-triangle"></i> @producto.Stock
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">@producto.Stock</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if (producto.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @* Botón para registrar movimiento de stock *@
+                            <a asp-controller="MovimientosStock" asp-action="Create"
+                               asp-route-productoId="@producto.Id"
+                               class="btn btn-sm btn-outline-success" title="Registrar movimiento">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </a>
+                            <a asp-action="Details" asp-route-id="@producto.Id"
+                               class="btn btn-sm btn-outline-info" title="Ver detalle">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@producto.Id"
+                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@producto.Id"
+                               class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

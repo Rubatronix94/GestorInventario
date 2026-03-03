@@ -1,0 +1,143 @@
+@model GestorInventario.Models.Producto
+
+@{
+    ViewData["Title"] = "Detalle del Producto";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">@Model.Nombre</h2>
+    <div class="d-flex gap-2">
+        <a asp-controller="MovimientosStock" asp-action="Create"
+           asp-route-productoId="@Model.Id" class="btn btn-success">
+            <i class="bi bi-arrow-left-right"></i> Registrar movimiento
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+            <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Volver
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    @* Tarjeta de información del producto *@
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white">
+                <i class="bi bi-box-seam"></i> Información del producto
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-6 text-muted">Precio</dt>
+                    <dd class="col-6 fw-bold fs-5">@Model.Precio.ToString("C")</dd>
+
+                    <dt class="col-6 text-muted">Stock actual</dt>
+                    <dd class="col-6">
+                        @if (Model.StockBajo)
+                        {
+                            <span class="badge bg-warning text-dark fs-6">
+                                <i class="bi bi-exclamation-triangle"></i> @Model.Stock uds.
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success fs-6">@Model.Stock uds.</span>
+                        }
+                    </dd>
+
+                    <dt class="col-6 text-muted">Stock mínimo</dt>
+                    <dd class="col-6">@Model.StockMinimo uds.</dd>
+
+                    <dt class="col-6 text-muted">Categoría</dt>
+                    <dd class="col-6">
+                        <span class="badge bg-info text-dark">@Model.Categoria?.Nombre</span>
+                    </dd>
+
+                    <dt class="col-6 text-muted">Proveedor</dt>
+                    <dd class="col-6">@(Model.Proveedor?.Nombre ?? "—")</dd>
+
+                    <dt class="col-6 text-muted">Estado</dt>
+                    <dd class="col-6">
+                        @if (Model.Activo)
+                        {
+                            <span class="badge bg-success">Activo</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactivo</span>
+                        }
+                    </dd>
+
+                    <dt class="col-6 text-muted">Fecha de alta</dt>
+                    <dd class="col-6">@Model.FechaAlta.ToString("dd/MM/yyyy")</dd>
+
+                    @if (!string.IsNullOrEmpty(Model.Descripcion))
+                    {
+                        <dt class="col-6 text-muted">Descripción</dt>
+                        <dd class="col-6">@Model.Descripcion</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    @* Historial de movimientos *@
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-dark text-white d-flex justify-content-between">
+                <span><i class="bi bi-clock-history"></i> Historial de movimientos</span>
+                <span class="badge bg-secondary">@Model.Movimientos.Count() registros</span>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.Movimientos.Any())
+                {
+                    <p class="text-muted p-3 mb-0">Sin movimientos registrados.</p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Tipo</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">Stock resultante</th>
+                                    <th>Notas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var mov in Model.Movimientos)
+                                {
+                                    <tr>
+                                        <td class="text-muted small">
+                                            @mov.Fecha.ToString("dd/MM/yy HH:mm")
+                                        </td>
+                                        <td>
+                                            @if (mov.Tipo == GestorInventario.Models.TipoMovimiento.Entrada)
+                                            {
+                                                <span class="badge bg-success">↑ Entrada</span>
+                                            }
+                                            else if (mov.Tipo == GestorInventario.Models.TipoMovimiento.Salida)
+                                            {
+                                                <span class="badge bg-danger">↓ Salida</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">⇄ Ajuste</span>
+                                            }
+                                        </td>
+                                        <td class="text-center fw-bold">@mov.Cantidad</td>
+                                        <td class="text-center">@mov.StockResultante</td>
+                                        <td class="text-muted small">@(mov.Notas ?? "—")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

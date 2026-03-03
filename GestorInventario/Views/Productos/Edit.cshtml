@@ -1,0 +1,109 @@
+@model GestorInventario.Models.Producto
+
+@{
+    ViewData["Title"] = "Editar Producto";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Editar Producto</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    @* Campos ocultos para preservar datos que no se editan *@
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="FechaAlta" />
+
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label asp-for="Nombre" class="form-label fw-semibold"></label>
+                            <input asp-for="Nombre" class="form-control" />
+                            <span asp-validation-for="Nombre" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="Precio" class="form-label fw-semibold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input asp-for="Precio" class="form-control" />
+                            </div>
+                            <span asp-validation-for="Precio" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Descripcion" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="2"></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Stock" class="form-label fw-semibold"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <div class="form-text text-warning">
+                                ⚠ Para cambiar el stock usa "Registrar movimiento", no edites aquí directamente.
+                            </div>
+                            <span asp-validation-for="Stock" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="StockMinimo" class="form-label fw-semibold"></label>
+                            <input asp-for="StockMinimo" class="form-control" />
+                            <span asp-validation-for="StockMinimo" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="CategoriaId" class="form-label fw-semibold"></label>
+                            <select asp-for="CategoriaId" asp-items="ViewBag.CategoriaId" class="form-select">
+                                <option value="">-- Selecciona categoría --</option>
+                            </select>
+                            <span asp-validation-for="CategoriaId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="ProveedorId" class="form-label fw-semibold"></label>
+                            <select asp-for="ProveedorId" asp-items="ViewBag.ProveedorId" class="form-select">
+                                <option value="">-- Sin proveedor --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="Activo" class="form-check-input" type="checkbox" />
+                            <label asp-for="Activo" class="form-check-label">Producto activo</label>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-warning flex-fill">
+                            <i class="bi bi-check-lg"></i> Guardar cambios
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                            Cancelar
+                        </a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

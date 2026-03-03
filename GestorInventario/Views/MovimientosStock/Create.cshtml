@@ -1,0 +1,92 @@
+@model GestorInventario.Models.MovimientoStock
+@using GestorInventario.Models
+
+@{
+    ViewData["Title"] = "Registrar Movimiento";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Registrar Movimiento</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProductoId" class="form-label fw-semibold">Producto</label>
+                        <select asp-for="ProductoId" asp-items="ViewBag.ProductoId" class="form-select">
+                            <option value="">-- Selecciona un producto --</option>
+                        </select>
+                        <span asp-validation-for="ProductoId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Tipo" class="form-label fw-semibold"></label>
+                        @* Generamos los radio buttons a partir del enum TipoMovimiento *@
+                        <div class="d-flex gap-3 mt-1">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Tipo"
+                                       value="@TipoMovimiento.Entrada" id="tipoEntrada" />
+                                <label class="form-check-label text-success fw-semibold" for="tipoEntrada">
+                                    ↑ Entrada
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Tipo"
+                                       value="@TipoMovimiento.Salida" id="tipoSalida" />
+                                <label class="form-check-label text-danger fw-semibold" for="tipoSalida">
+                                    ↓ Salida
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Tipo"
+                                       value="@TipoMovimiento.Ajuste" id="tipoAjuste" />
+                                <label class="form-check-label text-secondary fw-semibold" for="tipoAjuste">
+                                    ⇄ Ajuste
+                                </label>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Tipo" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Cantidad" class="form-label fw-semibold"></label>
+                        <input asp-for="Cantidad" class="form-control" placeholder="0" />
+                        <div class="form-text">
+                            En "Ajuste", este valor será el nuevo stock total del producto.
+                        </div>
+                        <span asp-validation-for="Cantidad" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Notas" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Notas" class="form-control" rows="2"
+                                  placeholder="Motivo del movimiento (opcional)..."></textarea>
+                        <span asp-validation-for="Notas" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-lg"></i> Registrar movimiento
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

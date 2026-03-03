@@ -1,0 +1,66 @@
+@model GestorInventario.Models.Proveedor
+
+@{
+    ViewData["Title"] = "Eliminar Proveedor";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0 text-danger">Eliminar Proveedor</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card border-danger shadow-sm">
+            <div class="card-body p-4">
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>¿Estás seguro?</strong> Esta acción no se puede deshacer.
+                    @if (Model.Productos.Any())
+                    {
+                        <br />
+                        <span>
+                            Al eliminar este proveedor, los
+                            <strong>@Model.Productos.Count() producto(s)</strong> asociados
+                            quedarán sin proveedor asignado.
+                        </span>
+                    }
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-4 text-muted">Nombre</dt>
+                    <dd class="col-sm-8"><strong>@Model.Nombre</strong></dd>
+
+                    <dt class="col-sm-4 text-muted">Contacto</dt>
+                    <dd class="col-sm-8">@(Model.Contacto ?? "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Email</dt>
+                    <dd class="col-sm-8">@(Model.Email ?? "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Productos</dt>
+                    <dd class="col-sm-8">@Model.Productos.Count()</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-danger flex-fill">
+                            <i class="bi bi-trash"></i> Sí, eliminar
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary flex-fill">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>

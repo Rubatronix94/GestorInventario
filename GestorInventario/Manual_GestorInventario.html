@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Manual de Usuario — GestorInventario</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #1e40af;
+    --primary-light: #dbeafe;
+    --accent: #059669;
+    --accent-light: #d1fae5;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f9fafb;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+    background: white;
+  }
+
+  /* PORTADA */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1d4ed8 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+
+  .cover-logo {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .cover h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: white;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .cover .subtitle {
+    font-size: 18px;
+    color: rgba(255,255,255,0.75);
+    margin-bottom: 40px;
+  }
+
+  .cover .version-badge {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    margin-bottom: 60px;
+  }
+
+  .cover-meta {
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    line-height: 2;
+  }
+
+  /* PÁGINA */
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 60px;
+  }
+
+  /* ÍNDICE */
+  .toc {
+    page-break-after: always;
+  }
+
+  .toc h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 32px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--primary);
+  }
+
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px dotted var(--border);
+  }
+
+  .toc-item.h1 { font-weight: 600; font-size: 14px; margin-top: 12px; }
+  .toc-item.h2 { padding-left: 20px; color: var(--muted); font-size: 12.5px; }
+
+  .toc-num {
+    color: var(--primary);
+    font-weight: 600;
+    min-width: 30px;
+  }
+
+  .toc-dots { flex: 1; border-bottom: 1px dotted var(--border); margin: 0 8px; position: relative; top: -4px; }
+
+  /* SECCIONES */
+  .section { margin-bottom: 48px; }
+
+  .section-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-num {
+    background: rgba(255,255,255,0.2);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .section-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 24px 0 12px;
+    padding-left: 12px;
+    border-left: 3px solid var(--primary);
+  }
+
+  p { margin-bottom: 12px; color: var(--text); }
+
+  /* CALLOUTS */
+  .callout {
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin: 16px 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .callout-icon { font-size: 18px; flex-shrink: 0; }
+  .callout-body { flex: 1; }
+  .callout-body strong { display: block; margin-bottom: 4px; }
+
+  .callout.info { background: var(--primary-light); border-left: 4px solid var(--primary); }
+  .callout.info .callout-icon::before { content: 'ℹ️'; }
+
+  .callout.success { background: var(--accent-light); border-left: 4px solid var(--accent); }
+  .callout.success .callout-icon::before { content: '✅'; }
+
+  .callout.warning { background: var(--warning-light); border-left: 4px solid var(--warning); }
+  .callout.warning .callout-icon::before { content: '⚠️'; }
+
+  /* PASOS */
+  .steps { margin: 16px 0; }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    background: var(--primary);
+    color: white;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content { flex: 1; }
+  .step-content strong { color: var(--text); }
+
+  /* TABLA */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 12.5px;
+  }
+
+  thead tr {
+    background: var(--primary);
+    color: white;
+  }
+
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+  }
+
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:nth-child(even) { background: var(--bg); }
+  tbody td { padding: 9px 14px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge.green { background: var(--accent-light); color: var(--accent); }
+  .badge.blue { background: var(--primary-light); color: var(--primary); }
+  .badge.yellow { background: var(--warning-light); color: var(--warning); }
+  .badge.red { background: #fee2e2; color: var(--danger); }
+
+  /* CARD */
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 16px 0;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+
+  .card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* GRID */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  /* MODULO CARD */
+  .module-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .module-card-header {
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    font-weight: 600;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .module-card-body {
+    padding: 14px 16px;
+    font-size: 12.5px;
+  }
+
+  .module-card-body li {
+    padding: 4px 0;
+    padding-left: 16px;
+    position: relative;
+    list-style: none;
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .module-card-body li:last-child { border-bottom: none; }
+
+  .module-card-body li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+  }
+
+  /* SCREEN MOCKUP */
+  .screen {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 16px 0;
+  }
+
+  .screen-bar {
+    background: #1f2937;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .screen-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+
+  .screen-url {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.7);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    flex: 1;
+  }
+
+  .screen-content {
+    padding: 20px;
+  }
+
+  /* UL / OL */
+  ul.list, ol.list {
+    margin: 12px 0 12px 20px;
+  }
+
+  ul.list li, ol.list li {
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  /* FOOTER */
+  .doc-footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  /* PRINT */
+  @media print {
+    .cover { page-break-after: always; min-height: 100vh; }
+    .toc { page-break-after: always; }
+    .section { page-break-inside: avoid; }
+    h3 { page-break-after: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="cover">
+  <div class="cover-logo">📦</div>
+  <h1>GestorInventario</h1>
+  <div class="subtitle">Manual de Usuario</div>
+  <div class="version-badge">Versión 1.0 · 2026</div>
+  <div class="cover-meta">
+    Desarrollado por Rubén Alcantarilla Bonillo<br>
+    Tecnología: ASP.NET Core 8 · Entity Framework · SQL Server<br>
+    Documento confidencial para uso interno del cliente
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ÍNDICE -->
+  <div class="toc">
+    <h2>Índice de contenidos</h2>
+
+    <div class="toc-item h1"><span class="toc-num">1.</span> Introducción y descripción del sistema <div class="toc-dots"></div> <span>2</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> ¿Qué es GestorInventario? <div class="toc-dots"></div> <span>2</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Módulos principales <div class="toc-dots"></div> <span>2</span></div>
+
+    <div class="toc-item h1"><span class="toc-num">2.</span> Requisitos e instalación <div class="toc-dots"></div> <span>3</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Requisitos del sistema <div class="toc-dots"></div> <span>3</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Acceso a la aplicación <div class="toc-dots"></div> <span>3</span></div>
+
+    <div class="toc-item h1"><span class="toc-num">3.</span> Gestión de Categorías <div class="toc-dots"></div> <span>4</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Crear una categoría <div class="toc-dots"></div> <span>4</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Editar y eliminar <div class="toc-dots"></div> <span>4</span></div>
+
+    <div class="toc-item h1"><span class="toc-num">4.</span> Gestión de Proveedores <div class="toc-dots"></div> <span>5</span></div>
+    <div class="toc-item h1"><span class="toc-num">5.</span> Gestión de Productos <div class="toc-dots"></div> <span>6</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Crear un producto <div class="toc-dots"></div> <span>6</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Alertas de stock bajo <div class="toc-dots"></div> <span>7</span></div>
+
+    <div class="toc-item h1"><span class="toc-num">6.</span> Movimientos de Stock <div class="toc-dots"></div> <span>8</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Registrar una entrada <div class="toc-dots"></div> <span>8</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Registrar una salida <div class="toc-dots"></div> <span>8</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Ajuste de inventario <div class="toc-dots"></div> <span>9</span></div>
+    <div class="toc-item h2"><span class="toc-num"></span> Historial de movimientos <div class="toc-dots"></div> <span>9</span></div>
+
+    <div class="toc-item h1"><span class="toc-num">7.</span> Preguntas frecuentes <div class="toc-dots"></div> <span>10</span></div>
+    <div class="toc-item h1"><span class="toc-num">8.</span> Soporte técnico <div class="toc-dots"></div> <span>10</span></div>
+  </div>
+
+  <!-- SECCIÓN 1 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Introducción y descripción del sistema</h2>
+    </div>
+
+    <p><strong>GestorInventario</strong> es una aplicación web diseñada para que cualquier empresa pueda controlar su stock de productos de forma sencilla, rápida y fiable. Permite saber en todo momento cuánto stock hay de cada producto, quién lo suministra, y llevar un historial completo de todas las entradas y salidas.</p>
+
+    <div class="callout success">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Sin instalaciones complicadas</strong>
+        La aplicación funciona desde cualquier navegador web moderno (Chrome, Edge, Firefox). No hace falta instalar nada en el ordenador del usuario.
+      </div>
+    </div>
+
+    <h3>Módulos principales</h3>
+
+    <div class="grid-2">
+      <div class="module-card">
+        <div class="module-card-header">🏷️ Categorías</div>
+        <ul class="module-card-body">
+          <li>Organiza los productos por tipo</li>
+          <li>Ver cuántos productos tiene cada categoría</li>
+          <li>Crear, editar y eliminar categorías</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-card-header">🚛 Proveedores</div>
+        <ul class="module-card-body">
+          <li>Gestiona los datos de cada proveedor</li>
+          <li>Teléfono, email y persona de contacto</li>
+          <li>Ver qué productos suministra cada uno</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-card-header">📦 Productos</div>
+        <ul class="module-card-body">
+          <li>Catálogo completo con precio y stock</li>
+          <li>Alerta automática de stock bajo</li>
+          <li>Historial de movimientos por producto</li>
+        </ul>
+      </div>
+      <div class="module-card">
+        <div class="module-card-header">🔄 Movimientos de Stock</div>
+        <ul class="module-card-body">
+          <li>Registra entradas y salidas</li>
+          <li>Ajustes de inventario con notas</li>
+          <li>Auditoría inmutable de todo el historial</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 2 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Requisitos e instalación</h2>
+    </div>
+
+    <h3>Requisitos del sistema</h3>
+
+    <table>
+      <thead>
+        <tr><th>Componente</th><th>Requisito</th><th>Notas</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Navegador</td><td>Chrome 90+, Edge 90+, Firefox 88+</td><td>No compatible con Internet Explorer</td></tr>
+        <tr><td>Conexión</td><td>Red local o Internet</td><td>Según configuración del servidor</td></tr>
+        <tr><td>Servidor</td><td>Windows Server / Linux con .NET 8</td><td>Gestionado por el proveedor</td></tr>
+        <tr><td>Base de datos</td><td>SQL Server 2019+</td><td>Gestionado por el proveedor</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Acceso a la aplicación</h3>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">Abre tu navegador web (Chrome o Edge recomendados).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">Escribe la dirección que te ha proporcionado el administrador, por ejemplo: <code>https://inventario.tuempresa.com</code></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">Verás la pantalla principal con el menú de navegación en la parte superior.</div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="screen-bar">
+        <div class="screen-dot" style="background:#ef4444"></div>
+        <div class="screen-dot" style="background:#f59e0b"></div>
+        <div class="screen-dot" style="background:#10b981"></div>
+        <div class="screen-url">https://inventario.tuempresa.com</div>
+      </div>
+      <div class="screen-content">
+        <div style="background:#1f2937;padding:10px 20px;border-radius:6px;display:flex;gap:24px;align-items:center;margin-bottom:16px;">
+          <span style="color:white;font-weight:700;font-size:14px;">📦 GestorInventario</span>
+          <span style="color:#9ca3af;font-size:12px;">📦 Productos</span>
+          <span style="color:#9ca3af;font-size:12px;">🏷️ Categorías</span>
+          <span style="color:#9ca3af;font-size:12px;">🚛 Proveedores</span>
+          <span style="color:#9ca3af;font-size:12px;">🔄 Movimientos</span>
+        </div>
+        <p style="color:#6b7280;font-size:12px;text-align:center;padding:20px;">← Menú de navegación principal. Desde aquí accedes a todos los módulos.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 3 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Gestión de Categorías</h2>
+    </div>
+
+    <p>Las categorías permiten organizar los productos por tipo (Electrónica, Ropa, Alimentación, etc.). Antes de crear productos, es recomendable tener las categorías configuradas.</p>
+
+    <h3>Ver todas las categorías</h3>
+    <p>Haz clic en <strong>Categorías</strong> en el menú superior. Verás una tabla con todas las categorías existentes y el número de productos que tiene cada una.</p>
+
+    <h3>Crear una nueva categoría</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">Haz clic en el botón azul <strong>+ Nueva categoría</strong> (arriba a la derecha).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">Rellena el campo <strong>Nombre</strong> (obligatorio) y opcionalmente una <strong>Descripción</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">Haz clic en <strong>Guardar categoría</strong>. Volverás al listado con la nueva categoría añadida.</div>
+      </div>
+    </div>
+
+    <h3>Editar una categoría</h3>
+    <p>En la tabla de categorías, haz clic en el icono de <strong>lápiz</strong> ✏️ de la categoría que quieres modificar. Cambia los datos y haz clic en <strong>Guardar cambios</strong>.</p>
+
+    <h3>Eliminar una categoría</h3>
+    <div class="callout warning">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Importante antes de eliminar</strong>
+        No puedes eliminar una categoría que tenga productos asignados. Primero debes reasignar o eliminar esos productos.
+      </div>
+    </div>
+    <p>Haz clic en el icono de <strong>papelera</strong> 🗑️. El sistema mostrará una pantalla de confirmación con los datos de la categoría. Si no tiene productos, podrás confirmar la eliminación.</p>
+  </div>
+
+  <!-- SECCIÓN 4 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Gestión de Proveedores</h2>
+    </div>
+
+    <p>Los proveedores son las empresas o personas que suministran los productos. Asociar un proveedor a un producto facilita saber a quién contactar cuando hay que reponer stock.</p>
+
+    <h3>Crear un proveedor</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">Haz clic en <strong>Proveedores</strong> en el menú superior.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">Haz clic en <strong>+ Nuevo proveedor</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">Rellena los datos. Solo el <strong>Nombre</strong> es obligatorio. El teléfono y email son opcionales pero muy útiles.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">Haz clic en <strong>Guardar proveedor</strong>.</div>
+      </div>
+    </div>
+
+    <h3>Campos disponibles</h3>
+    <table>
+      <thead>
+        <tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nombre</td><td><span class="badge red">Sí</span></td><td>Nombre de la empresa o proveedor</td></tr>
+        <tr><td>Contacto</td><td><span class="badge green">No</span></td><td>Nombre de la persona de contacto</td></tr>
+        <tr><td>Teléfono</td><td><span class="badge green">No</span></td><td>Teléfono de contacto</td></tr>
+        <tr><td>Email</td><td><span class="badge green">No</span></td><td>Correo electrónico (se valida el formato)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Consejo</strong>
+        En la pantalla de detalle de un proveedor puedes ver todos sus productos asociados de un vistazo, con su stock y precio actual.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 5 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Gestión de Productos</h2>
+    </div>
+
+    <p>El módulo de Productos es el núcleo de la aplicación. Aquí se gestiona el catálogo completo con precios, stock actual y stock mínimo de alerta.</p>
+
+    <h3>Crear un nuevo producto</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">Haz clic en <strong>Productos</strong> → <strong>+ Nuevo producto</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">Rellena el <strong>Nombre</strong> y el <strong>Precio</strong> (ambos obligatorios).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">Indica el <strong>Stock inicial</strong> y el <strong>Stock mínimo</strong>. Cuando el stock baje del mínimo, el sistema mostrará una alerta automática.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">Selecciona la <strong>Categoría</strong> (obligatoria) y opcionalmente el <strong>Proveedor</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">Haz clic en <strong>Guardar producto</strong>.</div>
+      </div>
+    </div>
+
+    <h3>Campos del producto</h3>
+    <table>
+      <thead>
+        <tr><th>Campo</th><th>Obligatorio</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Nombre</td><td><span class="badge red">Sí</span></td><td>Nombre del producto</td></tr>
+        <tr><td>Precio</td><td><span class="badge red">Sí</span></td><td>Precio en euros (mayor que 0)</td></tr>
+        <tr><td>Stock actual</td><td><span class="badge red">Sí</span></td><td>Unidades disponibles actualmente</td></tr>
+        <tr><td>Stock mínimo</td><td><span class="badge red">Sí</span></td><td>Umbral de alerta (por defecto: 5)</td></tr>
+        <tr><td>Categoría</td><td><span class="badge red">Sí</span></td><td>Tipo de producto</td></tr>
+        <tr><td>Proveedor</td><td><span class="badge green">No</span></td><td>Empresa suministradora</td></tr>
+        <tr><td>Descripción</td><td><span class="badge green">No</span></td><td>Información adicional</td></tr>
+        <tr><td>Activo</td><td>—</td><td>Desmarcar para ocultar el producto sin eliminarlo</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Alertas de stock bajo</h3>
+    <div class="callout warning">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>¿Cuándo aparece la alerta?</strong>
+        Cuando el stock actual de un producto es igual o menor a su stock mínimo, ese producto aparece resaltado en amarillo en la tabla y se muestra un aviso en la parte superior de la página de Productos con los nombres de los artículos afectados.
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h4>🟢 Stock normal</h4>
+        <p style="font-size:12px;">El stock es mayor que el mínimo configurado. El número aparece en verde.</p>
+      </div>
+      <div class="card">
+        <h4>🟡 Stock bajo</h4>
+        <p style="font-size:12px;">El stock es igual o menor al mínimo. La fila se resalta en amarillo y el número aparece con icono de alerta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 6 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Movimientos de Stock</h2>
+    </div>
+
+    <p>Cada vez que entran o salen unidades de un producto, se debe registrar un movimiento. Esto mantiene el stock siempre actualizado y genera un historial completo que sirve como auditoría.</p>
+
+    <div class="callout info">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Principio importante</strong>
+        Los movimientos de stock son permanentes y no se pueden editar ni eliminar. Esto garantiza la integridad del historial. Si cometes un error, debes registrar un movimiento contrario para corregirlo.
+      </div>
+    </div>
+
+    <h3>Tipos de movimiento</h3>
+    <table>
+      <thead>
+        <tr><th>Tipo</th><th>Cuándo usarlo</th><th>Efecto en el stock</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge green">↑ Entrada</span></td>
+          <td>Llega mercancía de un proveedor</td>
+          <td>Suma la cantidad al stock actual</td>
+        </tr>
+        <tr>
+          <td><span class="badge red">↓ Salida</span></td>
+          <td>Se vende o consume un producto</td>
+          <td>Resta la cantidad del stock actual</td>
+        </tr>
+        <tr>
+          <td><span class="badge yellow">⇄ Ajuste</span></td>
+          <td>Se hace un recuento físico y hay diferencia</td>
+          <td>Establece el stock al valor exacto indicado</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Registrar una entrada de stock</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">Ve a <strong>Productos</strong> y haz clic en el icono <strong>⇄</strong> del producto que ha recibido mercancía. O ve a <strong>Movimientos → Registrar movimiento</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">Selecciona el producto en el desplegable (si no viene preseleccionado).</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">Selecciona el tipo <strong>↑ Entrada</strong>.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">Introduce la <strong>cantidad</strong> de unidades recibidas.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">Opcionalmente añade una nota (ej: "Pedido proveedor nº 1234").</div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">Haz clic en <strong>Registrar movimiento</strong>. El stock se actualizará automáticamente.</div>
+      </div>
+    </div>
+
+    <h3>Registrar una salida de stock</h3>
+    <p>El proceso es idéntico a la entrada, pero seleccionando el tipo <strong>↓ Salida</strong>.</p>
+    <div class="callout warning">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Control automático</strong>
+        El sistema no permite registrar una salida mayor al stock disponible. Si intentas sacar más unidades de las que hay, mostrará un error indicando el stock actual.
+      </div>
+    </div>
+
+    <h3>Ajuste de inventario</h3>
+    <p>Usa el tipo <strong>⇄ Ajuste</strong> cuando hagas un recuento físico y el número real de unidades no coincida con el que figura en el sistema. En este caso, en el campo <strong>Cantidad</strong> introduces el stock real contado (no la diferencia, sino el número total).</p>
+
+    <div class="card">
+      <h4>📋 Ejemplo de ajuste</h4>
+      <p style="font-size:12px;">El sistema indica que hay 50 camisetas, pero al hacer el recuento físico solo hay 47. Registra un Ajuste con cantidad 47. El sistema establecerá el stock a 47 y guardará el movimiento en el historial.</p>
+    </div>
+
+    <h3>Historial de movimientos</h3>
+    <p>Puedes ver el historial completo de dos formas:</p>
+    <ul class="list">
+      <li><strong>Por producto:</strong> entra en el detalle de un producto (icono 👁️) y verás su historial individual en la parte derecha.</li>
+      <li><strong>Global:</strong> haz clic en <strong>Movimientos</strong> en el menú superior para ver todos los movimientos de todos los productos ordenados por fecha.</li>
+    </ul>
+  </div>
+
+  <!-- SECCIÓN 7 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Preguntas frecuentes</h2>
+    </div>
+
+    <div class="card">
+      <h4>❓ ¿Por qué no puedo eliminar una categoría?</h4>
+      <p style="font-size:12px;margin:0;">Porque tiene productos asignados. Edita esos productos y cámbiales la categoría antes de intentar eliminarla.</p>
+    </div>
+
+    <div class="card">
+      <h4>❓ Me he equivocado en una salida, ¿cómo lo corrijo?</h4>
+      <p style="font-size:12px;margin:0;">Los movimientos no se pueden eliminar. Registra una <strong>Entrada</strong> con la misma cantidad para compensar el error, y añade una nota explicando que es una corrección.</p>
+    </div>
+
+    <div class="card">
+      <h4>❓ ¿Qué significa "Producto inactivo"?</h4>
+      <p style="font-size:12px;margin:0;">Un producto inactivo no aparece en el selector de movimientos de stock. Es útil para productos que ya no se comercializan pero quieres conservar su historial.</p>
+    </div>
+
+    <div class="card">
+      <h4>❓ La alerta de stock bajo sigue saliendo aunque ya repuse el producto</h4>
+      <p style="font-size:12px;margin:0;">Asegúrate de haber registrado la entrada de stock correctamente. Si el stock actual sigue siendo menor o igual al stock mínimo configurado, la alerta seguirá activa. Puedes ajustar el stock mínimo editando el producto.</p>
+    </div>
+  </div>
+
+  <!-- SECCIÓN 8 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>Soporte técnico</h2>
+    </div>
+
+    <p>Para cualquier incidencia técnica, error en la aplicación o solicitud de nueva funcionalidad, contacta con el desarrollador:</p>
+
+    <div class="card">
+      <h4>👨‍💻 Rubén Alcantarilla Bonillo — Desarrollador</h4>
+      <table style="margin:0;">
+        <tbody>
+          <tr><td style="color:#6b7280;width:120px;">Email</td><td>ruben.alcantarilla@email.com</td></tr>
+          <tr><td style="color:#6b7280;">GitHub</td><td>github.com/Rubatronix94</td></tr>
+          <tr><td style="color:#6b7280;">Ubicación</td><td>Valencia, España</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout info">
+      <div class="callout-icon"></div>
+      <div class="callout-body">
+        <strong>Al reportar un error, incluye siempre:</strong>
+        Descripción de lo que estabas haciendo, el mensaje de error exacto si aparece, y el navegador que estás usando. Esto agiliza enormemente la resolución.
+      </div>
+    </div>
+  </div>
+
+  <div class="doc-footer">
+    GestorInventario v1.0 · Manual de Usuario · © 2026 Rubén Alcantarilla Bonillo · Todos los derechos reservados
+  </div>
+
+</div>
+</body>
+</html>

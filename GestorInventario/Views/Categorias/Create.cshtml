@@ -1,0 +1,61 @@
+@model GestorInventario.Models.Categoria
+
+@{
+    ViewData["Title"] = "Nueva Categoría";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Nueva Categoría</h2>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                @* asp-action indica a qué acción del controlador apunta el formulario *@
+                <form asp-action="Create">
+
+                    @* Este token oculto protege contra ataques CSRF *@
+                    @Html.AntiForgeryToken()
+
+                    @* asp-validation-summary muestra todos los errores juntos arriba *@
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        @* asp-for genera automáticamente el label con el Display Name del modelo *@
+                        <label asp-for="Nombre" class="form-label fw-semibold"></label>
+                        @* asp-for en el input genera el name, id y value correctos *@
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Electrónica" />
+                        @* asp-validation-for muestra el error de validación de ese campo *@
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Descripcion" class="form-label fw-semibold"></label>
+                        <textarea asp-for="Descripcion" class="form-control" rows="3"
+                                  placeholder="Descripción opcional..."></textarea>
+                        <span asp-validation-for="Descripcion" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-check-lg"></i> Guardar categoría
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@* Scripts de validación del lado del cliente (muestra errores sin hacer submit) *@
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

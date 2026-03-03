@@ -1,0 +1,81 @@
+@model GestorInventario.Models.Proveedor
+
+@{
+    ViewData["Title"] = "Detalle del Proveedor";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">@Model.Nombre</h2>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-dark text-white">
+                <i class="bi bi-truck"></i> Información del proveedor
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Nombre</dt>
+                    <dd class="col-sm-8"><strong>@Model.Nombre</strong></dd>
+
+                    <dt class="col-sm-4 text-muted">Contacto</dt>
+                    <dd class="col-sm-8">@(Model.Contacto ?? "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Teléfono</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Telefono))
+                        {
+                            <a href="tel:@Model.Telefono">@Model.Telefono</a>
+                        }
+                        else { <span>—</span> }
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Email</dt>
+                    <dd class="col-sm-8">
+                        @if (!string.IsNullOrEmpty(Model.Email))
+                        {
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        }
+                        else { <span>—</span> }
+                    </dd>
+
+                    <dt class="col-sm-4 text-muted">Total productos</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-primary fs-6">@Model.Productos.Count()</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (Model.Productos.Any())
+        {
+            <h5 class="mb-3">Productos de este proveedor</h5>
+            <ul class="list-group">
+                @foreach (var producto in Model.Productos)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <a asp-controller="Productos" asp-action="Details"
+                           asp-route-id="@producto.Id" class="text-decoration-none">
+                            @producto.Nombre
+                        </a>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-secondary">Stock: @producto.Stock</span>
+                            <span class="badge bg-dark">@producto.Precio.ToString("C")</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+
+    </div>
+</div>

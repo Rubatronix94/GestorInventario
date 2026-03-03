@@ -1,0 +1,55 @@
+@model GestorInventario.Models.Categoria
+
+@{
+    ViewData["Title"] = "Detalle de Categoría";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Detalle de Categoría</h2>
+            <div class="d-flex gap-2">
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-warning">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-muted">Nombre</dt>
+                    <dd class="col-sm-8"><strong>@Model.Nombre</strong></dd>
+
+                    <dt class="col-sm-4 text-muted">Descripción</dt>
+                    <dd class="col-sm-8">@(Model.Descripcion ?? "—")</dd>
+
+                    <dt class="col-sm-4 text-muted">Total productos</dt>
+                    <dd class="col-sm-8">
+                        <span class="badge bg-primary fs-6">@Model.Productos.Count()</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        @* Lista de productos de esta categoría *@
+        @if (Model.Productos.Any())
+        {
+            <h5 class="mb-3">Productos en esta categoría</h5>
+            <ul class="list-group">
+                @foreach (var producto in Model.Productos)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        @producto.Nombre
+                        <span class="badge bg-secondary">Stock: @producto.Stock</span>
+                    </li>
+                }
+            </ul>
+        }
+
+    </div>
+</div>
