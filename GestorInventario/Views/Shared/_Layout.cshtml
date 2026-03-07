@@ -54,8 +54,18 @@
 
                     </ul>
                 </div>
-
+                @if (User.Identity!.IsAuthenticated)
+                {
+                    <span class="navbar-text text-muted me-3">@User.Identity.Name</span>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-light btn-sm">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                }
             </div>
+            
         </nav>
     </header>
     <div class="container">

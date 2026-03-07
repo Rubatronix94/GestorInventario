@@ -2,9 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using GestorInventario.Data;
 using GestorInventario.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GestorInventario.Controllers
 {
+    [Authorize]
     public class CategoriasController : Controller
     {
         // ─────────────────────────────────────────────────────────

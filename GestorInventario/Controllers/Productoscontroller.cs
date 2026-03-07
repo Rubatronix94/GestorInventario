@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using GestorInventario.Data;
 using GestorInventario.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GestorInventario.Controllers
 {
+    [Authorize]
     public class ProductosController : Controller
     {
         private readonly AppDbContext _context;
