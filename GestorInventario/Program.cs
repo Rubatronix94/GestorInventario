@@ -54,23 +54,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Productos}/{action=Index}/{id?}");
 
-//app.Run();
-
-// Crear usuario administrador inicial — BORRAR después de crearlo
-using (var scope = app.Services.CreateScope())
-{
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-
-    if (await userManager.FindByEmailAsync("admin@gestor.com") == null)
-    {
-        var user = new IdentityUser
-        {
-            UserName = "admin@gestor.com",
-            Email = "admin@gestor.com",
-            EmailConfirmed = true
-        };
-        await userManager.CreateAsync(user, "Admin123!");
-    }
-}
 
 app.Run();
