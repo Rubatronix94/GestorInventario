@@ -1,185 +1,176 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using GestorInventario.Data;
 using GestorInventario.Models;
+using GestorInventario.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace GestorInventario.Controllers
 {
-    [Authorize]
+    [Authorize] // Solo usuarios logueados
     public class ProductosController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly TenantService _tenant;
 
-        public ProductosController(AppDbContext context)
+        public ProductosController(AppDbContext context, TenantService tenant)
         {
             _context = context;
+            _tenant = tenant;
         }
 
-        // ─────────────────────────────────────────────────────────
-        // INDEX — Lista de productos con sus relaciones
-        // Aquí usamos Include() para cargar Categoria y Proveedor
-        // en la misma consulta (evita el problema N+1 de consultas)
-        // GET: /Productos
-        // ─────────────────────────────────────────────────────────
+        // GET: Productos
         public async Task<IActionResult> Index()
         {
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
+            // ✅ Solo productos de la empresa del usuario logueado
             var productos = await _context.Productos
-                .Include(p => p.Categoria)   // Carga la categoría relacionada
-                .Include(p => p.Proveedor)   // Carga el proveedor relacionado
-                .OrderBy(p => p.Nombre)      // Ordena alfabéticamente
+                .Where(p => p.EmpresaId == empresaId)
+                .Include(p => p.Categoria)
+                .Include(p => p.Proveedor)
+                .OrderBy(p => p.Nombre)
                 .ToListAsync();
 
             return View(productos);
         }
 
-        // ─────────────────────────────────────────────────────────
-        // DETAILS — Detalle completo del producto con historial
-        // GET: /Productos/Details/5
-        // ─────────────────────────────────────────────────────────
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var producto = await _context.Productos
-                .Include(p => p.Categoria)
-                .Include(p => p.Proveedor)
-                .Include(p => p.Movimientos.OrderByDescending(m => m.Fecha)) // Historial reciente primero
-                .FirstOrDefaultAsync(p => p.Id == id);
-
-            if (producto == null) return NotFound();
-
-            return View(producto);
-        }
-
-        // ─────────────────────────────────────────────────────────
-        // CREATE (GET) — Formulario con dropdowns de Categoria y Proveedor
-        // GET: /Productos/Create
-        // ─────────────────────────────────────────────────────────
+        // GET: Productos/Create
         public async Task<IActionResult> Create()
         {
-            // SelectList genera las opciones para los <select> del formulario
-            // Parámetros: (colección, campo valor, campo texto mostrado)
-            await CargarSelectLists();
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
+            // Solo categorías y proveedores de esta empresa
+            ViewData["CategoriaId"] = new SelectList(
+                _context.Categorias.Where(c => c.EmpresaId == empresaId), "Id", "Nombre");
+            ViewData["ProveedorId"] = new SelectList(
+                _context.Proveedores.Where(p => p.EmpresaId == empresaId), "Id", "Nombre");
+
             return View();
         }
 
-        // POST: /Productos/Create
+        // POST: Productos/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nombre,Descripcion,Precio,Stock,StockMinimo,CategoriaId,ProveedorId,Activo")] Producto producto)
+        public async Task<IActionResult> Create(Producto producto)
         {
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
             if (ModelState.IsValid)
             {
-                producto.FechaAlta = DateTime.Now;
+                // ✅ Asignamos el EmpresaId automáticamente — el usuario no lo ve ni lo toca
+                producto.EmpresaId = empresaId;
+                producto.FechaAlta = DateTime.UtcNow;
+
                 _context.Add(producto);
                 await _context.SaveChangesAsync();
-
-                // TempData guarda un mensaje que se muestra solo una vez
-                // en la siguiente página (como una notificación flash)
-                TempData["Exito"] = $"Producto '{producto.Nombre}' creado correctamente.";
-
                 return RedirectToAction(nameof(Index));
             }
 
-            // Si hay errores, recargamos los SelectList antes de devolver la vista
-            await CargarSelectLists(producto.CategoriaId, producto.ProveedorId);
+            ViewData["CategoriaId"] = new SelectList(
+                _context.Categorias.Where(c => c.EmpresaId == empresaId), "Id", "Nombre", producto.CategoriaId);
+            ViewData["ProveedorId"] = new SelectList(
+                _context.Proveedores.Where(p => p.EmpresaId == empresaId), "Id", "Nombre", producto.ProveedorId);
+
             return View(producto);
         }
 
-        // GET: /Productos/Edit/5
+        // GET: Productos/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos.FindAsync(id);
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
+            // ✅ Verificamos que el producto pertenece a esta empresa
+            var producto = await _context.Productos
+                .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
 
             if (producto == null) return NotFound();
 
-            await CargarSelectLists(producto.CategoriaId, producto.ProveedorId);
+            ViewData["CategoriaId"] = new SelectList(
+                _context.Categorias.Where(c => c.EmpresaId == empresaId), "Id", "Nombre", producto.CategoriaId);
+            ViewData["ProveedorId"] = new SelectList(
+                _context.Proveedores.Where(p => p.EmpresaId == empresaId), "Id", "Nombre", producto.ProveedorId);
+
             return View(producto);
         }
 
-        // POST: /Productos/Edit/5
+        // POST: Productos/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Descripcion,Precio,Stock,StockMinimo,CategoriaId,ProveedorId,Activo,FechaAlta")] Producto producto)
+        public async Task<IActionResult> Edit(int id, Producto producto)
         {
             if (id != producto.Id) return NotFound();
 
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(producto);
-                    await _context.SaveChangesAsync();
-                    TempData["Exito"] = $"Producto '{producto.Nombre}' actualizado correctamente.";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductoExiste(producto.Id))
-                        return NotFound();
-                    else
-                        throw;
-                }
+                // Cargamos el original para no perder EmpresaId ni FechaAlta
+                var productoOriginal = await _context.Productos
+                    .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
+
+                if (productoOriginal == null) return NotFound();
+
+                // Actualizamos solo los campos editables del formulario
+                productoOriginal.Nombre = producto.Nombre;
+                productoOriginal.Descripcion = producto.Descripcion;
+                productoOriginal.Precio = producto.Precio;
+                productoOriginal.Stock = producto.Stock;
+                productoOriginal.StockMinimo = producto.StockMinimo;
+                productoOriginal.Activo = producto.Activo;
+                productoOriginal.CategoriaId = producto.CategoriaId;
+                productoOriginal.ProveedorId = producto.ProveedorId;
+                // EmpresaId y FechaAlta se quedan como estaban ✅
+
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
 
-            await CargarSelectLists(producto.CategoriaId, producto.ProveedorId);
+            ViewData["CategoriaId"] = new SelectList(
+                _context.Categorias.Where(c => c.EmpresaId == empresaId), "Id", "Nombre", producto.CategoriaId);
+            ViewData["ProveedorId"] = new SelectList(
+                _context.Proveedores.Where(p => p.EmpresaId == empresaId), "Id", "Nombre", producto.ProveedorId);
+
             return View(producto);
         }
 
-        // GET: /Productos/Delete/5
+        // GET: Productos/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
             var producto = await _context.Productos
                 .Include(p => p.Categoria)
                 .Include(p => p.Proveedor)
-                .FirstOrDefaultAsync(p => p.Id == id);
+                .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
 
             if (producto == null) return NotFound();
 
             return View(producto);
         }
 
-        // POST: /Productos/Delete/5
+        // POST: Productos/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var producto = await _context.Productos.FindAsync(id);
+            var empresaId = await _tenant.GetEmpresaIdAsync();
+
+            var producto = await _context.Productos
+                .FirstOrDefaultAsync(p => p.Id == id && p.EmpresaId == empresaId);
 
             if (producto != null)
             {
                 _context.Productos.Remove(producto);
                 await _context.SaveChangesAsync();
-                TempData["Exito"] = "Producto eliminado correctamente.";
             }
 
             return RedirectToAction(nameof(Index));
-        }
-
-        // ─────────────────────────────────────────────────────────
-        // Método privado: carga los SelectList en ViewData
-        // para que las vistas puedan generar los <select>
-        // Los parámetros opcionales preseleccionan el valor actual
-        // (importante en Edit para que salga el valor correcto)
-        // ─────────────────────────────────────────────────────────
-        private async Task CargarSelectLists(int? categoriaId = null, int? proveedorId = null)
-        {
-            var categorias = await _context.Categorias.OrderBy(c => c.Nombre).ToListAsync();
-            var proveedores = await _context.Proveedores.OrderBy(p => p.Nombre).ToListAsync();
-
-            ViewData["CategoriaId"] = new SelectList(categorias, "Id", "Nombre", categoriaId);
-            ViewData["ProveedorId"] = new SelectList(proveedores, "Id", "Nombre", proveedorId);
-        }
-
-        private bool ProductoExiste(int id)
-        {
-            return _context.Productos.Any(p => p.Id == id);
         }
     }
 }

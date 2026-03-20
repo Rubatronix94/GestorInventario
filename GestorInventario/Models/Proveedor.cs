@@ -1,5 +1,4 @@
-﻿using GestorInventario.Models;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace GestorInventario.Models
 {
@@ -12,7 +11,7 @@ namespace GestorInventario.Models
         [Display(Name = "Nombre")]
         public string Nombre { get; set; } = string.Empty;
 
-        [StringLength(100, ErrorMessage = "Máximo 100 caracteres")]
+        [StringLength(100)]
         [Display(Name = "Contacto")]
         public string? Contacto { get; set; }
 
@@ -26,7 +25,12 @@ namespace GestorInventario.Models
         [Display(Name = "Email")]
         public string? Email { get; set; }
 
+        // ── Multi-tenancy ──────────────────────────────
+        public int EmpresaId { get; set; }
+        public Empresa? Empresa { get; set; }
+
         // Navegación
         public ICollection<Producto> Productos { get; set; } = new List<Producto>();
     }
 }
+

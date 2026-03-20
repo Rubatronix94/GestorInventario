@@ -35,7 +35,7 @@ namespace GestorInventario.Models
         public bool Activo { get; set; } = true;
 
         [Display(Name = "Fecha de alta")]
-        public DateTime FechaAlta { get; set; } = DateTime.Now;
+        public DateTime FechaAlta { get; set; } = DateTime.UtcNow;
 
         // Foreign Keys
         [Required(ErrorMessage = "La categoría es obligatoria")]
@@ -45,12 +45,15 @@ namespace GestorInventario.Models
         [Display(Name = "Proveedor")]
         public int? ProveedorId { get; set; }
 
+        // ── Multi-tenancy ──────────────────────────────
+        public int EmpresaId { get; set; }
+        public Empresa? Empresa { get; set; }
+
         // Navegación
         public Categoria? Categoria { get; set; }
         public Proveedor? Proveedor { get; set; }
         public ICollection<MovimientoStock> Movimientos { get; set; } = new List<MovimientoStock>();
 
-        // Propiedad calculada (no se guarda en BD)
         [NotMapped]
         public bool StockBajo => Stock <= StockMinimo;
     }
